@@ -1,0 +1,12 @@
+[project]
+name = "inscriptions-esadanse"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datetime>=5.5",
+    "image>=1.5.33",
+    "pandas>=2.2.3",
+    "streamlit>=1.45.1",
+]
