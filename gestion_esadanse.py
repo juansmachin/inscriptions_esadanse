@@ -7,7 +7,7 @@ from PIL import Image
 FILENAME = "inscriptions_esadanse.csv"
 
 COLUMNS = [
-    "ID", "Nom", "Prénom", "Date de naissance", "Code postal", "Ville", "Danse", "Email", "Tél", 
+    "ID", "Nom", "Prénom", "Date de naissance", "Code postal", "Ville", "Cours", "Email", "Tél", 
     "Nom responsable légal", "Prénom responsable légal", "Email responsable légal", "Tél responsable légal", "Date d'inscription", "Mode de paiement"
 ]
 
@@ -31,7 +31,6 @@ def generate_id(df):
     return 1 if df.empty else int(df["ID"].max()) + 1
 
 def reindex_ids(df):
-    # Réindexe les IDs de manière séquentielle
     df["ID"] = range(1, len(df) + 1)
     return df
 
@@ -73,7 +72,7 @@ if "Ajouter" in menu:
         datenaissance = st.date_input("Date de naissance", min_value=min_birth_date, max_value=max_birth_date)
         codepostal = st.text_input("Code postal")
         ville = st.text_input("Ville")
-        danse = st.selectbox("Choix de danse", ["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"])
+        cours = st.selectbox("Choix de cours", ["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"])
         email = st.text_input("Email")
         tel = st.text_input("Téléphone")
         nom_rl = st.text_input("Nom responsable légal")
@@ -88,7 +87,7 @@ if "Ajouter" in menu:
             if nom and prenom and email:
                 new_id = generate_id(df)
                 new_row = pd.DataFrame([[
-                    new_id, nom, prenom, datenaissance, codepostal, ville, danse, email, tel,
+                    new_id, nom, prenom, datenaissance, codepostal, ville, cours, email, tel,
                     nom_rl, prenom_rl, email_rl, tel_rl, dateinscription, modepaiement
                 ]], columns=COLUMNS)
                 df = pd.concat([df, new_row], ignore_index=True)
@@ -100,30 +99,27 @@ if "Ajouter" in menu:
 elif "Afficher" in menu:
     st.subheader("📄 Liste des inscriptions")
 
-    danse_filter = st.multiselect("Filtrer par type de danse", options=df["Danse"].dropna().unique(), default=df["Danse"].dropna().unique())
-    filtered_df = df[df["Danse"].isin(danse_filter)]
+    danse_filter = st.multiselect("Filtrer par cours", options=df["Cours"].dropna().unique(), default=df["Cours"].dropna().unique())
+    filtered_df = df[df["Cours"].isin(danse_filter)]
 
     st.dataframe(filtered_df)
 
     st.subheader("📊 Statistiques")
     col1, col2 = st.columns(2)
     col1.metric("👥 Total inscrits", len(filtered_df))
-    col2.metric("🕺 Cours", filtered_df["Danse"].nunique())
+    col2.metric("🕺 Cours", filtered_df["Cours"].nunique())
 
     st.subheader("📈 Répartition par cours")
-    st.bar_chart(filtered_df["Danse"].value_counts())
+    st.bar_chart(filtered_df["Cours"].value_counts())
 
 elif "Modifier" in menu:
     st.subheader("✏️ Modifier une inscription existante")
 
     if not df.empty:
-        # Crée une nouvelle colonne avec 'Nom' et 'Prénom' concaténés
         df['Nom et Prénom'] = df["Nom"] + " " + df["Prénom"]
         
-        # Affiche le nom et prénom dans le selectbox pour choisir la personne à modifier
         selected_person = st.selectbox("Choisir la personne à modifier", df['Nom et Prénom'])
 
-        # Récupère la ligne correspondante à la personne sélectionnée
         row = df[df["Nom et Prénom"] == selected_person].iloc[0]
 
         with st.form("form_edit"):
@@ -132,7 +128,7 @@ elif "Modifier" in menu:
             datenaissance = st.date_input("Date de naissance", value=pd.to_datetime(row["Date de naissance"]), min_value=min_birth_date, max_value=max_birth_date)
             codepostal = st.text_input("Code postal", value=row["Code postal"])
             ville = st.text_input("Ville", value=row["Ville"])
-            danse = st.selectbox("Danse", ["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"], index=["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"].index(row["Danse"]))
+            cours = st.selectbox("Cours", ["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"], index=["Modern'jazz enfant/ado", "Modern'jazz adulte", "Pilates", "Gym douce", "Salsa"].index(row["Cours"]))
             email = st.text_input("Email", value=row["Email"])
             tel = st.text_input("Téléphone", value=row["Tél"])
             nom_rl = st.text_input("Nom responsable légal", value=row["Nom responsable légal"])
@@ -146,8 +142,8 @@ elif "Modifier" in menu:
 
             if submitted:
                 # Met à jour la ligne avec les nouvelles données sans la colonne 'Cours'
-                df.loc[df["Nom et Prénom"] == selected_person, ["Nom", "Prénom", "Date de naissance", "Code postal", "Ville", "Danse", "Email", "Tél", "Nom responsable légal", "Prénom responsable légal", "Email responsable légal", "Tél responsable légal", "Date d'inscription", "Mode de paiement"]] = [
-                    nom, prenom, datenaissance, codepostal, ville, danse, email, tel, nom_rl, prenom_rl, email_rl, tel_rl, dateinscription, modepaiement
+                df.loc[df["Nom et Prénom"] == selected_person, ["Nom", "Prénom", "Date de naissance", "Code postal", "Ville", "Cours", "Email", "Tél", "Nom responsable légal", "Prénom responsable légal", "Email responsable légal", "Tél responsable légal", "Date d'inscription", "Mode de paiement"]] = [
+                    nom, prenom, datenaissance, codepostal, ville, cours, email, tel, nom_rl, prenom_rl, email_rl, tel_rl, dateinscription, modepaiement
                 ]
                 save_data(df)
                 st.success("Inscription mise à jour avec succès.")
@@ -157,24 +153,18 @@ elif "Supprimer" in menu:
     st.subheader("🗑️ Supprimer une inscription")
 
     if not df.empty:
-        # Créer la colonne 'Nom et Prénom' si elle n'existe pas
         df['Nom et Prénom'] = df["Nom"] + " " + df["Prénom"]
 
-        # Sélectionner la personne à supprimer
         selected_person = st.selectbox("Choisir la personne à supprimer", df["Nom et Prénom"])
 
-        # Obtenir la ligne de la personne sélectionnée
         row = df[df["Nom et Prénom"] == selected_person].iloc[0]
         selected_id = row["ID"]
 
-        # Afficher les informations avant confirmation
         st.write("Voulez-vous vraiment supprimer cette inscription ?")
-        st.write(row.drop("Nom et Prénom"))  # Affiche les infos sauf la colonne concaténée
+        st.write(row.drop("Nom et Prénom"))  
 
-        # Bouton de confirmation
         if st.button("Confirmer la suppression"):
-            # Supprimer la ligne par ID
             df = df[df["ID"] != selected_id]
             df = reindex_ids(df)
             save_data(df)
-            st.success("Inscription supprimée.")
+            st.success("Inscription supprimée")
