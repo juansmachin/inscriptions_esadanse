@@ -8,7 +8,9 @@ L'application permet de :
   -Visualiser la liste des élèves inscrits  
   -Filtrer les élèves par type de danse  
   -Modifier les informations en cas d'erreur ou de changement  
-  -Supprimer une inscription si nécessaire  
+  -Supprimer une inscription si nécessaire    
+
+Par la suite, on cherchera à adapter l'application aux besoins pendant la prochaine campagne d'inscriptions 
 
 # Technologies utilisées
 -Python  
