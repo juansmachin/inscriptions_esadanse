@@ -13,3 +13,7 @@ L'application permet de :
 # Technologies utilisées
 -Python  
 -Streamlit pour l'interface
+
+# Fait par : 
+-Juan Machin  
+-Dorian Baes
